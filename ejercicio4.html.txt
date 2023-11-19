@@ -1,0 +1,63 @@
+<?php
+session_start();
+
+// Inicializar el número aleatorio en la primera visita
+if (!isset($_SESSION['randomNumber'])) {
+    $_SESSION['randomNumber'] = rand(1, 10);
+    $_SESSION['attempts'] = 0;
+}
+
+// Verificar si el usuario ha enviado un intento
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $userGuess = isset($_POST['guess']) ? (int)$_POST['guess'] : null;
+
+    if ($userGuess !== null) {
+        $_SESSION['attempts']++;
+
+        // Verificar si el usuario adivinó el número
+        if ($userGuess == $_SESSION['randomNumber']) {
+            $message = "¡Felicidades! Has adivinado el número en " . $_SESSION['attempts'] . " intentos.";
+            // Reiniciar el juego
+            unset($_SESSION['randomNumber']);
+            unset($_SESSION['attempts']);
+        } elseif ($userGuess < $_SESSION['randomNumber']) {
+            $message = "Intenta con un número más alto.";
+        } else {
+            $message = "Intenta con un número más bajo.";
+        }
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Adivinanzas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Juego de Adivinanzas</h1>
+
+    <?php
+    if (isset($message)) {
+        echo "<p>$message</p>";
+    }
+    ?>
+
+    <form method="post">
+        <label for="guess">Adivina el número (entre 1 y 10):</label>
+        <input type="number" id="guess" name="guess" min="1" max="10" required>
+        <button type="submit">Adivinar</button>
+    </form>
+
+</body>
+</html>

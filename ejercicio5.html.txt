@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Galería de Imágenes</title>
+</head>
+<body>
+
+    <div class="gallery">
+        <?php include 'load_images.php'; ?>
+    </div>
+
+</body>
+</html>
+<?php
+$directory = 'images'; // Directorio donde se almacenan las imágenes
+$allowedExtensions = ['jpg', 'jpeg', 'png', 'gif']; // Extensiones permitidas
+
+$images = glob($directory . '/*.{'.implode(',', $allowedExtensions).'}', GLOB_BRACE);
+
+foreach ($images as $image) {
+    echo '<img src="' . $image . '" alt="Imagen">';
+}
+?>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.gallery img {
+    max-width: 100%;
+    height: auto;
+    margin: 10px;
+}

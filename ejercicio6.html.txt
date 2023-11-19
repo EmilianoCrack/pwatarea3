@@ -1,0 +1,184 @@
+CREATE DATABASE IF NOT EXISTS `mi_base_de_datos`;
+
+USE `mi_base_de_datos`;
+
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+);
+
+INSERT INTO `users` (`username`, `password`) VALUES
+('usuario1', 'contraseña1'),
+('usuario2', 'contraseña2');
+<?php
+session_start();
+
+// Configuración de la base de datos
+$servername = "localhost";
+$username = "tu_usuario";
+$password = "tu_contraseña";
+$dbname = "mi_base_de_datos";
+
+// Crear conexión
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Verificar la conexión
+if ($conn->connect_error) {
+    die("La conexión a la base de datos ha fallado: " . $conn->connect_error);
+}
+
+// Inicializar variables
+$username = "";
+$password = "";
+$errors = array();
+
+// Procesar el formulario de inicio de sesión
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = mysqli_real_escape_string($conn, $_POST['username']);
+    $password = mysqli_real_escape_string($conn, $_POST['password']);
+
+    // Validar campos obligatorios
+    if (empty($username)) {
+        array_push($errors, "El nombre de usuario es requerido");
+    }
+    if (empty($password)) {
+        array_push($errors, "La contraseña es requerida");
+    }
+
+    // Si no hay errores, verificar las credenciales del usuario
+    if (count($errors) == 0) {
+        $query = "SELECT * FROM users WHERE username='$username' AND password='$password'";
+        $result = mysqli_query($conn, $query);
+
+        if (mysqli_num_rows($result) == 1) {
+            // Usuario autenticado correctamente
+            $_SESSION['username'] = $username;
+            $_SESSION['success'] = "¡Has iniciado sesión correctamente!";
+            header('location: welcome.php'); // Redirigir a la página de bienvenida o a la página principal
+        } else {
+            array_push($errors, "Credenciales incorrectas. Por favor, intenta de nuevo.");
+        }
+    }
+}
+
+// Verificar si el usuario está autenticado
+function isLoggedIn() {
+    return isset($_SESSION['username']);
+}
+?>
+<?php
+session_start();
+
+if (!isset($_SESSION['username'])) {
+    header('location: login.php');
+}
+
+// Aquí puedes mostrar el contenido de la página de bienvenida
+
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido</title>
+</head>
+<body>
+
+    <h1>Bienvenido, <?php echo $_SESSION['username']; ?>!</h1>
+    <p><a href="logout.php">Cerrar sesión</a></p>
+
+</body>
+</html>
+<?php
+session_start();
+session_destroy();
+unset($_SESSION['username']);
+header('location: login.php');
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Iniciar Sesión</title>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>Iniciar Sesión</h2>
+
+        <form method="post" action="login.php">
+            <?php include('errors.php'); ?>
+            <div class="input-group">
+                <label>Nombre de Usuario</label>
+                <input type="text" name="username" required>
+            </div>
+            <div class="input-group">
+                <label>Contraseña</label>
+                <input type="password" name="password" required>
+            </div>
+            <div class="input-group">
+                <button type="submit" class="btn" name="login_user">Iniciar Sesión</button>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>
+<?php if (count($errors) > 0): ?>
+    <div class="error">
+        <?php foreach ($errors as $error): ?>
+            <p><?php echo $error; ?></p>
+        <?php endforeach ?>
+    </div>
+<?php endif ?>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.login-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+}
+
+.input-group {
+    margin: 10px 0;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 16px;
+}
+
+.btn {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #45a049;
+}
+
+.error {
+    color: #ff0000;
+    margin-bottom: 10px;
+}

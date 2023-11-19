@@ -1,0 +1,35 @@
+<?php
+session_start();
+
+// Verificar si la variable de sesión 'visits' está definida
+if (!isset($_SESSION['visits'])) {
+    // Si no está definida, inicializarla a 1 (primera visita)
+    $_SESSION['visits'] = 1;
+} else {
+    // Si está definida, incrementar el contador de visitas
+    $_SESSION['visits']++;
+}
+
+// Mostrar el número de visitas
+echo "<!DOCTYPE html>
+<html lang='es'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Contador de Visitas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+    </style>
+</head>
+<body>";
+
+echo "<h1>Bienvenido a mi sitio web</h1>";
+echo "<p>Número de visitas: " . $_SESSION['visits'] . "</p>";
+
+echo "</body>
+</html>";
+?>
